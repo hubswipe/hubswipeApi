@@ -16,8 +16,21 @@ const UserSchema = new mongoose.Schema({
       message: '{VALUE} is not a valid email'
     }
   },
-  facebookId: String,
-  googleId: String,
+  firstname: {
+    type: String,
+    required: true,
+    unique: false,
+  },
+  lastname: {
+    type: String,
+    required: true,
+    unique: false
+  },
+  propertyowner: {
+    type: String,
+    required: true,
+    unique: false
+  },
   properties: [{
     type: mongoose.Schema.Types.ObjectId, ref: 'Property'
   }],
@@ -40,6 +53,28 @@ const UserSchema = new mongoose.Schema({
     }
   }]
 });
+
+UserSchema.methods.toJSON = function() {
+  let user = this;
+  let userObject = user.toObject();
+
+  return _.pick(userObject, ['_id', 'firstname', 'lastname', 'propertyowner', 'email']);
+};
+
+UserSchema.methods.generateAuthToken = function() {
+  let user = this;
+  let access = 'auth';
+  let token = jwt.sign({_id: user._id.toHexString(), access}, 'abctest').toString();
+
+  user.tokens.push({
+    access,
+    token
+  });
+
+  return user.save().then(() => {
+    return token;
+  });
+};
 
 
 const User = mongoose.model('User', UserSchema);

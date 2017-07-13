@@ -12,6 +12,8 @@ app.use(bodyParser.json());
 const index = require('./routes/index');
 const users = require('./routes/users');
 
+app.use(logger('dev'));
+
 app.use('/', index);
 app.use('/users', users);
 
