@@ -6,13 +6,4 @@ const {User} = require('../models/user');
 const {Property} = require('../models/property');
 
 
-router.route('/')
-
-  .get((req, res, next) => {
-    res.json('hello from api');
-  })
-  .post((req, res, next) => {
-
-  });
-
 module.exports = router;
