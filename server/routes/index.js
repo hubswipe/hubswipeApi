@@ -15,4 +15,10 @@ router.route('/')
 
   });
 
+  router.get('/allusers', (req, res, next) => {
+    User.find({}).then(users => {
+      res.send(users);
+    });
+  });
+
 module.exports = router;

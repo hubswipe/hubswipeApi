@@ -32,6 +32,26 @@ router.route('/hubswipeuser')
     });
   });
 
+  router.route('/login/hubswipeuser')
+
+    .get((req, res, next) => {
+
+    })
+    .post((req, res, next) => {
+
+      let body = _.pick(req.body, ['email', 'password']);
+
+      User.findByCredentials(body.email, body.password).then(user => {
+        //res.send(user);
+        return user.generateAuthToken().then( token => {
+          res.header('x-auth', token).send(user);
+        });
+      })
+      .catch(e => {
+        res.status(400).send();
+      });
+    });
+
   router.route('/hubswipeuser/addproperty')
 
   .get((req, res, next) => {
