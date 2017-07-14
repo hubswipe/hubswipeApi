@@ -5,9 +5,15 @@ const _ = require('lodash');
 const {User} = require('../models/user');
 const {Property} = require('../models/property');
 
+const {authenticate} = require('../middleware/authenticate');
+
 router.route('/hubswipeuser')
 
-  .get((req, res, next) => {
+  .get(authenticate, (req, res, next) => {
+    //console.log(req.hello);
+    res.send(req.user);
+    /*let user = req.user;
+    console.log(user);*/
 
   })
   .post((req, res, next) => {
