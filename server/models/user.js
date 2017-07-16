@@ -19,16 +19,19 @@ const UserSchema = new mongoose.Schema({
   firstname: {
     type: String,
     required: true,
+    trim: true,
     unique: false,
   },
   lastname: {
     type: String,
     required: true,
+    trim: true,
     unique: false
   },
   propertyowner: {
     type: String,
     required: true,
+    trim: true,
     unique: false
   },
   properties: [{
@@ -40,6 +43,7 @@ const UserSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true,
+    trim: true,
     minlength: 6
   },
   tokens: [{
@@ -76,6 +80,18 @@ UserSchema.methods.generateAuthToken = function() {
   });
 };
 
+UserSchema.methods.removeToken = function (token) {
+  let user = this;
+
+  return user.update({
+    $pull: {
+      tokens: {
+        token
+      }
+    }
+  });
+};
+
 UserSchema.statics.findByToken = function(token) {
   let User = this;
   let decoded;
@@ -89,7 +105,7 @@ UserSchema.statics.findByToken = function(token) {
     });*/
     return Promise.reject();
   }
-  console.log(decoded);
+  //console.log(decoded);
 
   return User.findOne({
     _id: decoded._id,
@@ -119,7 +135,7 @@ UserSchema.statics.findByCredentials = function (email, password) {
   });
 };
 
-UserSchema.pre('save', function(next) {
+/*UserSchema.pre('save', function(next) {
   let user = this;
 
   if (user.isModified('password')) {
@@ -133,7 +149,8 @@ UserSchema.pre('save', function(next) {
   else {
     next();
   }
-});
+});*/
+
 
 const User = mongoose.model('User', UserSchema);
 
