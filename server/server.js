@@ -36,6 +36,8 @@ app.use('/', index);
 app.use('/users', users);
 app.use('/property', property);
 
-app.listen(3030, () => {
+let port = 3030 || process.env.PORT
+
+app.listen(port, () => {
   console.log('Started on port 3030');
 });
