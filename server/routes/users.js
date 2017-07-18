@@ -117,11 +117,11 @@ router.route('/hubswipeuser/account/update')
     if(body.email !== user.email) {
       let link = 'hello'
 
-      Email.sendEmail(body.email, link)
+      return Email.sendEmail(body.email, link)
         .then(response => {
-          return res.send('please confirm your new email to finish updating your profile');
+          res.send('please confirm your new email to finish updating your profile');
         }).catch(err => {
-          return console.log('error', err)
+          console.log('error', err)
         });
     }
 
