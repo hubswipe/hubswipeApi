@@ -43,7 +43,7 @@ router.route('/hubswipeuser')
       .then(response => {
         res.send('success!!')
       }).catch(err => {
-        res.send('error!!!')
+        res.send(err)
       });
 
     /*let user = new User(body);
