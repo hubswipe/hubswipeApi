@@ -16,6 +16,10 @@ const PropertySchema = new mongoose.Schema({
   views: {
     type: String
     //review this
+  },
+  geoLocation: {
+    type: String
+    //review this
   }
 });
 

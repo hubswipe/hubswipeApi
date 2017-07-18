@@ -1,13 +1,14 @@
 const express = require('express');
 const router = express.Router();
-const validator = require('validator');
 const _ = require('lodash');
 const bcrypt = require('bcryptjs');
+const {ObjectID} = require('mongodb');
 
 const {User} = require('../models/user');
 const {Property} = require('../models/property');
 
 const {authenticate} = require('../middleware/authenticate');
+const {Email} = require('../utils');
 
 router.route('/hubswipeuser')
 
@@ -21,6 +22,29 @@ router.route('/hubswipeuser')
   .post((req, res, next) => {
 
     let body = _.pick(req.body, ['firstname', 'lastname', 'propertyowner', 'email', 'password', 'confirmpassword']);
+
+    req.checkBody('firstname', 'firstname field is required').notEmpty();
+    req.checkBody('lastname', 'lastname field is required').notEmpty();
+    req.checkBody('propertyowner', 'are you a property owner?').notEmpty();
+    req.checkBody('email', 'choose an email please').notEmpty();
+    req.checkBody('email', "pls use a valid email address").isEmail();
+    req.checkBody('password', "you didn't pick a password").notEmpty();
+    req.checkBody('confirmpassword', 'passwords do not match').equals(req.body.password);
+
+    let error = req.validationErrors();
+
+    if(error) {
+      return res.send(error);
+    }
+
+    let link = 'hello'
+
+    Email.sendEmail(req.body.email, link)
+      .then(response => {
+        console.log('success');
+      }).catch(err => {
+        console.log(err);
+      });
 
     let user = new User(body);
 
@@ -75,8 +99,18 @@ router.route('/hubswipeuser/account/update')
       return res.json('stop!');
     }
 
-    if(body.confirmpassword !== body.password) {
-      return res.json('your new passwords do not match');
+    req.checkBody('firstname', 'firstname field is required').notEmpty();
+    req.checkBody('lastname', 'lastname field is required').notEmpty();
+    req.checkBody('propertyowner', 'this field is required').notEmpty();
+    req.checkBody('email', 'choose an email please').notEmpty();
+    req.checkBody('email', "pls use a valid email address").isEmail();
+    req.checkBody('password', "you didn't pick a password").notEmpty();
+    req.checkBody('confirmpassword', 'passwords do not match').equals(req.body.password);
+
+    let error = req.validationErrors();
+
+    if(error) {
+      return res.send(error);
     }
 
     User.findOneAndUpdate(
@@ -139,16 +173,33 @@ router.route('/hubswipeuser/account/delete')
       });
     });
 
-router.route('/hubswipeuser/addproperty')
+router.route('/hubswipeuser/property')
 
-  .get((req, res, next) => {
-    res.json('hello from property route');
+  .get(authenticate, (req, res, next) => {
+
+    Property.find({
+      owner: req.user._id
+    }).then(property => {
+      res.send({property})
+    })
+    .catch(e => {
+      res.send(e)
+    })
   })
-  .post((req, res, next) => {
+  .post(authenticate, (req, res, next) => {
 
     let body = _.pick(req.body, ['description']);
 
+    req.checkBody('description', 'this field is required').notEmpty();
+
+    let error = req.validationErrors();
+
+    if(error) {
+      return res.send(error);
+    }
+
     let property = new Property(body);
+    property.owner = req.user._id;
 
     property.save().then(property => {
       res.send(property);
@@ -157,6 +208,59 @@ router.route('/hubswipeuser/addproperty')
     });
 
   });
+
+router.patch('/hubswipeuser/property/:id', authenticate, (req, res, next) => {
+  let propertyId = req.params.id;
+  let body = _.pick(req.body, ['description']);
+
+  req.checkBody('description', 'this field is required').notEmpty();
+
+  let error = req.validationErrors();
+
+  if(error) {
+    return res.send(error);
+  }
+
+  if(!ObjectID.isValid(propertyId)) {
+    return res.status(404).send();
+  }
+
+  Property.findOneAndUpdate({
+    _id: propertyId,
+    owner: req.user._id
+  }, {$set: body}, {new: true})
+  .then(property => {
+    if(!property) {
+      return res.status(404).send();
+    }
+    res.send({property});
+  })
+  .catch(e => {
+    res.status(400).send();
+  });
+});
+
+router.delete('/hubswipeuser/property/:id', authenticate, (req, res, next) => {
+  let propertyId = req.params.id;
+
+  if(!ObjectID.isValid(propertyId)) {
+    return res.status(404).send();
+  }
+
+  Property.findOneAndRemove({
+    _id: propertyId,
+    owner: req.user._id
+  })
+  .then(property => {
+    if(!property) {
+      return res.status(404).send();
+    }
+    res.send({property});
+  })
+  .catch(e => {
+    res.status(400).send();
+  });
+})
 
 
 module.exports = router;

@@ -15,7 +15,7 @@ let authenticate = (req, res, next) => {
     next();
 
   }).catch( e => {
-      res.status(401).send();
+      res.status(401).send('this is from the authenicate function');
   });
 };
 
