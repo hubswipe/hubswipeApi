@@ -4,10 +4,10 @@ const Promise = require('bluebird');
 const sg = require('sendgrid')(process.env.SENDGRID_API_KEY);
 
 module.exports = {
-  sendEmail: function(reqBody, confirmationLink) {
+  sendEmail: function(email, confirmationLink) {
     return new Promise((resolve, reject) => {
       const from_email = new helper.Email('nerdyemmanuel@gmail.com');
-      const to_email = new helper.Email(reqBody.email);
+      const to_email = new helper.Email(email);
       const subject = 'pls confirm your spacetwig account';
       const content = new helper.Content('text/html', confirmationLink);
       const mail = new helper.Mail(from_email, subject, to_email, content);
