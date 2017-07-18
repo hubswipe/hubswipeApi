@@ -41,12 +41,12 @@ router.route('/hubswipeuser')
 
     Email.sendEmail(req.body.email, link)
       .then(response => {
-        console.log('success');
+        res.send('success!!')
       }).catch(err => {
-        console.log(err);
+        res.send('error!!!')
       });
 
-    let user = new User(body);
+    /*let user = new User(body);
 
     bcrypt.genSalt(10, (err, salt) => {
       bcrypt.hash(user.password, salt, (err, hash) => {
@@ -60,7 +60,7 @@ router.route('/hubswipeuser')
           res.status(400).send(e);
         });
       });
-    });
+    });*/
   });
 
   router.route('/hubswipeuser/account/login')
