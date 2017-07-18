@@ -41,12 +41,12 @@ router.route('/hubswipeuser')
 
     Email.sendEmail(req.body.email, link)
       .then(response => {
-        res.send('success!!')
+        console.log('success', response)
       }).catch(err => {
-        res.send(err)
+        console.log('error', err)
       });
 
-    /*let user = new User(body);
+    let user = new User(body);
 
     bcrypt.genSalt(10, (err, salt) => {
       bcrypt.hash(user.password, salt, (err, hash) => {
@@ -60,7 +60,7 @@ router.route('/hubswipeuser')
           res.status(400).send(e);
         });
       });
-    });*/
+    });
   });
 
   router.route('/hubswipeuser/account/login')
@@ -82,6 +82,7 @@ router.route('/hubswipeuser')
         res.status(400).send();
       });
     });
+
 
 router.route('/hubswipeuser/account/update')
   .get(authenticate, (req, res, next) => {
@@ -113,6 +114,17 @@ router.route('/hubswipeuser/account/update')
       return res.send(error);
     }
 
+    if(body.email !== user.email) {
+      let link = 'hello'
+
+      Email.sendEmail(body.email, link)
+        .then(response => {
+          return res.send('please confirm your new email to finish updating your profile');
+        }).catch(err => {
+          return console.log('error', err)
+        });
+    }
+
     User.findOneAndUpdate(
       {_id: user._id},
       {
@@ -138,7 +150,7 @@ router.route('/hubswipeuser/account/update')
         res.json(user);
 
   }
-);
+  );
   });
 
 router.delete('/hubswipeuser/account/logout', authenticate, (req, res, next) => {

@@ -8,7 +8,7 @@ module.exports = {
     return new Promise((resolve, reject) => {
       const from_email = new helper.Email('nerdyemmanuel@gmail.com');
       const to_email = new helper.Email(email);
-      const subject = 'pls confirm your spacetwig account';
+      const subject = 'pls confirm your hubswipe account';
       const content = new helper.Content('text/html', confirmationLink);
       const mail = new helper.Mail(from_email, subject, to_email, content);
 
