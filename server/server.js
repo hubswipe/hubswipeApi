@@ -36,8 +36,26 @@ app.use('/', index);
 app.use('/users', users);
 app.use('/property', property);
 
-let port = 3030 || process.env.PORT
+let port = normalizePort(process.env.PORT || '3030');
+app.set('port', port);
+
+function normalizePort(val) {
+  var port = parseInt(val, 10);
+
+  if (isNaN(port)) {
+    // named pipe
+    return val;
+  }
+
+  if (port >= 0) {
+    // port number
+    return port;
+  }
+
+  return false;
+}
+
 
 app.listen(port, () => {
-  console.log('Started on port 3030');
+  console.log(`Started on port ${port}`);
 });
